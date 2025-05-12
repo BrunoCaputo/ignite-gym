@@ -5,7 +5,7 @@ import {
   useFonts,
 } from '@expo-google-fonts/roboto'
 import { GluestackUIProvider } from '@gluestack-ui/themed'
-import { SignIn } from '@screens/SignIn'
+import { SignUp } from '@screens/SignUp'
 import { StatusBar } from 'react-native'
 
 import { config } from './config/gluestack-ui.config'
@@ -20,7 +20,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <SignIn /> : <Loading />}
+      {fontsLoaded ? <SignUp /> : <Loading />}
     </GluestackUIProvider>
   )
 }
