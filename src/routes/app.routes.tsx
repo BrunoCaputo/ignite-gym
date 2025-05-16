@@ -26,7 +26,7 @@ const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>()
 
 export function AppRoutes() {
   const { tokens } = gluestackUIConfig
-  const iconSize = tokens.space['8']
+  const iconSize = tokens.space['6']
 
   return (
     <Navigator
@@ -75,7 +75,10 @@ export function AppRoutes() {
       <Screen
         name="exercise"
         component={Exercise}
-        options={{ tabBarButton: () => null }}
+        options={{
+          tabBarItemStyle: { display: 'none' },
+          tabBarButton: () => null,
+        }}
       />
     </Navigator>
   )
