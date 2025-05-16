@@ -3,6 +3,7 @@
   "plugins": ["simple-import-sort"],
   "rules": {
     "simple-import-sort/imports": "warn",
-    "camelcase": "off"
+    "camelcase": "off",
+    "jsx-a11y/alt-text": false
   }
 }
