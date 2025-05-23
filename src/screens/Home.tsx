@@ -2,6 +2,8 @@ import { ExerciseCard } from '@components/ExerciseCard'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
+import { useNavigation } from '@react-navigation/native'
+import { AppNavigatorRoutesProps } from '@routes/app.routes'
 import { useState } from 'react'
 import { FlatList } from 'react-native'
 
@@ -14,6 +16,12 @@ export function Home() {
   ])
   const [groups] = useState<string[]>(['Costas', 'Bíceps', 'Tríceps', 'Ombro'])
   const [groupSelected, setGroupSelected] = useState<string>('Costas')
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>()
+
+  function handleOpenExerciseDetails() {
+    navigation.navigate('exercise')
+  }
 
   return (
     <VStack flex={1}>
@@ -53,6 +61,7 @@ export function Home() {
               title={item}
               legend="3 séries x 12 repetições"
               imageUri="https://static.wixstatic.com/media/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp/v1/fill/w_350,h_375,al_c/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp"
+              onPress={handleOpenExerciseDetails}
             />
           )}
           showsVerticalScrollIndicator={false}
