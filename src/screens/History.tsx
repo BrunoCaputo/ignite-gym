@@ -6,18 +6,21 @@ import { SectionList } from 'react-native'
 
 interface IExercise {
   title: string
-  data: string[]
+  data: { group: string; exercise: string; time: string }[]
 }
 
 export function History() {
   const [exercises] = useState<IExercise[]>([
     {
       title: '22.07.24',
-      data: ['Puxada frontal', 'Remada unilateral'],
+      data: [
+        { group: 'costas', exercise: 'Puxada frontal', time: '08:56' },
+        { group: 'costas', exercise: 'Remada unilateral', time: '09:00' },
+      ],
     },
     {
       title: '23.07.24',
-      data: ['Puxada frontal'],
+      data: [{ group: 'costas', exercise: 'Puxada frontal', time: '10:27' }],
     },
   ])
 
@@ -27,8 +30,10 @@ export function History() {
 
       <SectionList
         sections={exercises}
-        keyExtractor={(item) => item}
-        renderItem={() => <HistoryCard />}
+        keyExtractor={(item) => item.exercise}
+        renderItem={({ item: { group, exercise, time } }) => (
+          <HistoryCard group={group} exercise={exercise} time={time} />
+        )}
         renderSectionHeader={({ section }) => (
           <Heading color="$gray200" fontSize="$md" mt="$10" mb="$3">
             {section.title}
