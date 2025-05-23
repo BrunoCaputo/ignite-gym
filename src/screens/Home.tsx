@@ -3,7 +3,7 @@ import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
 import { useNavigation } from '@react-navigation/native'
-import { AppNavigatorRoutesProps } from '@routes/app.routes'
+import { AppNavigatorRoutesProps, AppRoutes } from '@routes/app.routes'
 import { useState } from 'react'
 import { FlatList } from 'react-native'
 
@@ -19,8 +19,8 @@ export function Home() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>()
 
-  function handleOpenExerciseDetails() {
-    navigation.navigate('exercise')
+  function handleOpenExerciseDetails(params: AppRoutes['exercise']) {
+    navigation.navigate('exercise', params)
   }
 
   return (
@@ -61,7 +61,19 @@ export function Home() {
               title={item}
               legend="3 séries x 12 repetições"
               imageUri="https://static.wixstatic.com/media/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp/v1/fill/w_350,h_375,al_c/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp"
-              onPress={handleOpenExerciseDetails}
+              onPress={() => {
+                const [series, reps] = '3 séries x 12 repetições'
+                  .split('x')
+                  .map((data) => data.trim())
+                handleOpenExerciseDetails({
+                  title: item,
+                  group: groupSelected.toLowerCase(),
+                  imageUri:
+                    'https://static.wixstatic.com/media/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp/v1/fill/w_350,h_375,al_c/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp',
+                  series,
+                  reps,
+                })
+              }}
             />
           )}
           showsVerticalScrollIndicator={false}

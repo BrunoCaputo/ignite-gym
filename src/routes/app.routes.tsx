@@ -5,6 +5,7 @@ import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
+import { RouteProp } from '@react-navigation/native'
 import { Exercise } from '@screens/Exercise'
 import { History } from '@screens/History'
 import { Home } from '@screens/Home'
@@ -13,14 +14,22 @@ import { Platform } from 'react-native'
 
 import { gluestackUIConfig } from '../../config/gluestack-ui.config'
 
-type AppRoutes = {
+export type AppRoutes = {
   home: undefined
-  exercise: undefined
+  exercise: {
+    title: string
+    group: string
+    imageUri: string
+    series: string
+    reps: string
+  }
   profile: undefined
   history: undefined
 }
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>
+
+export type ExerciseRouteProp = RouteProp<AppRoutes, 'exercise'>
 
 const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>()
 
