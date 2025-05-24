@@ -1,13 +1,13 @@
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { ScreenHeader } from '@components/ScreenHeader'
+import { ToastMessage } from '@components/ToastMessage'
 import { UserPhoto } from '@components/UserPhoto'
-import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+import { Center, Heading, Text, useToast, VStack } from '@gluestack-ui/themed'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,6 +18,8 @@ export function Profile() {
   const [userPhoto, setUserPhoto] = useState(
     'https://github.com/BrunoCaputo.png',
   )
+
+  const toast = useToast()
 
   async function handleUserPhotoSelect() {
     try {
@@ -40,9 +42,18 @@ export function Profile() {
         }
 
         if (imageInfo.size && imageInfo.size / 1024 / 1024 > 5) {
-          return Alert.alert(
-            'Essa imagem é muito grande. Escolha uma de até 5MB',
-          )
+          return toast.show({
+            placement: 'top',
+            render: ({ id }) => (
+              <ToastMessage
+                id={id}
+                action="error"
+                title="Image muito grande!"
+                description="Escolha uma de até 5MB"
+                onClose={() => toast.close(id)}
+              />
+            ),
+          })
         }
 
         setUserPhoto(selectedImage.assets[0].uri)
