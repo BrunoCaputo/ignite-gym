@@ -11,12 +11,27 @@ import {
   VStack,
 } from '@gluestack-ui/themed'
 import { useNavigation } from '@react-navigation/native'
+import { useState } from 'react'
 
 export function SignUp() {
+  const [name, setName] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [passwordConfirm, setPasswordConfirm] = useState<string>('')
+
   const navigation = useNavigation()
 
   function handleLogin() {
     navigation.goBack()
+  }
+
+  function handleSignUp() {
+    console.log({
+      name,
+      email,
+      password,
+      passwordConfirm,
+    })
   }
 
   return (
@@ -46,16 +61,28 @@ export function SignUp() {
           <Center flex={1} gap="$2">
             <Heading color="$gray100">Crie sua conta</Heading>
 
-            <Input placeholder="Nome" />
+            <Input placeholder="Nome" onChangeText={setName} />
 
             <Input
               placeholder="E-mail"
               keyboardType="email-address"
               autoCapitalize="none"
+              onChangeText={setEmail}
             />
-            <Input placeholder="Senha" secureTextEntry />
 
-            <Button title="Criar e acessar" />
+            <Input
+              placeholder="Senha"
+              secureTextEntry
+              onChangeText={setPassword}
+            />
+
+            <Input
+              placeholder="Confirme a Senha"
+              secureTextEntry
+              onChangeText={setPasswordConfirm}
+            />
+
+            <Button title="Criar e acessar" onPress={handleSignUp} />
           </Center>
 
           <Button
