@@ -4,6 +4,7 @@ import { ScreenHeader } from '@components/ScreenHeader'
 import { UserPhoto } from '@components/UserPhoto'
 import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
 import * as ImagePicker from 'expo-image-picker'
+import { useState } from 'react'
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,13 +13,23 @@ import {
 } from 'react-native'
 
 export function Profile() {
+  const [userPhoto, setUserPhoto] = useState(
+    'https://github.com/BrunoCaputo.png',
+  )
+
   async function handleUserPhotoSelect() {
-    await ImagePicker.launchImageLibraryAsync({
+    const selectedImage = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: 'images',
       quality: 1,
       aspect: [4, 4],
       allowsEditing: true,
     })
+
+    if (selectedImage.canceled) {
+      return
+    }
+
+    setUserPhoto(selectedImage.assets[0].uri)
   }
 
   return (
@@ -32,7 +43,7 @@ export function Profile() {
         <ScrollView contentContainerStyle={{ paddingBottom: 36 }}>
           <Center mt="$6" px="$10">
             <UserPhoto
-              source={{ uri: 'https://github.com/BrunoCaputo.png' }}
+              source={{ uri: userPhoto }}
               size="xl"
               alt="Imagem do usuário"
             />
