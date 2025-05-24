@@ -22,7 +22,13 @@ interface FormDataProps {
 }
 
 export function SignUp() {
-  const { control, handleSubmit } = useForm<FormDataProps>()
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    defaultValues: { name: '', email: '', password: '', password_confirm: '' },
+  })
   const navigation = useNavigation()
 
   function handleLogin() {
@@ -72,11 +78,15 @@ export function SignUp() {
               <Controller
                 control={control}
                 name="name"
+                rules={{
+                  required: 'Informe o nome.',
+                }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     placeholder="Nome"
                     onChangeText={onChange}
                     value={value}
+                    errorMessage={errors.name?.message}
                   />
                 )}
               />
@@ -84,6 +94,13 @@ export function SignUp() {
               <Controller
                 control={control}
                 name="email"
+                rules={{
+                  required: 'Informe o email.',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'E-mail inválido',
+                  },
+                }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     placeholder="E-mail"
@@ -91,6 +108,7 @@ export function SignUp() {
                     autoCapitalize="none"
                     onChangeText={onChange}
                     value={value}
+                    errorMessage={errors.email?.message}
                   />
                 )}
               />
