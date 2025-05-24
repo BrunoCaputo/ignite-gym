@@ -3,9 +3,11 @@ import { Input } from '@components/Input'
 import { ScreenHeader } from '@components/ScreenHeader'
 import { UserPhoto } from '@components/UserPhoto'
 import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,18 +20,36 @@ export function Profile() {
   )
 
   async function handleUserPhotoSelect() {
-    const selectedImage = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      quality: 1,
-      aspect: [4, 4],
-      allowsEditing: true,
-    })
+    try {
+      const selectedImage = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      })
 
-    if (selectedImage.canceled) {
-      return
+      if (selectedImage.canceled) {
+        return
+      }
+
+      const imageUri = selectedImage.assets[0].uri
+
+      if (imageUri) {
+        const imageInfo = (await FileSystem.getInfoAsync(imageUri)) as {
+          size: number
+        }
+
+        if (imageInfo.size && imageInfo.size / 1024 / 1024 > 5) {
+          return Alert.alert(
+            'Essa imagem é muito grande. Escolha uma de até 5MB',
+          )
+        }
+
+        setUserPhoto(selectedImage.assets[0].uri)
+      }
+    } catch (error) {
+      console.error(error)
     }
-
-    setUserPhoto(selectedImage.assets[0].uri)
   }
 
   return (
