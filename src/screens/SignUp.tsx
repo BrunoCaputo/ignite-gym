@@ -12,6 +12,7 @@ import {
 } from '@gluestack-ui/themed'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigation } from '@react-navigation/native'
+import { api } from '@services/api'
 import { Controller, useForm } from 'react-hook-form'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import * as yup from 'yup'
@@ -47,8 +48,8 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      // TODO
-      console.log({ name, email, password })
+      const { data } = await api.post('/users', { name, email, password })
+      console.log(data)
     } catch (error) {
       console.error('Error during sign up:', error)
     }
