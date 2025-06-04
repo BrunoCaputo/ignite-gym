@@ -13,8 +13,9 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigation } from '@react-navigation/native'
 import { api } from '@services/api'
+import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
-import { KeyboardAvoidingView, Platform } from 'react-native'
+import { Alert, KeyboardAvoidingView, Platform } from 'react-native'
 import * as yup from 'yup'
 
 const signUpSchema = yup.object({
@@ -51,7 +52,9 @@ export function SignUp() {
       const { data } = await api.post('/users', { name, email, password })
       console.log(data)
     } catch (error) {
-      console.error('Error during sign up:', error)
+      if (axios.isAxiosError(error)) {
+        Alert.alert(error.response?.data.message)
+      }
     }
   }
 
