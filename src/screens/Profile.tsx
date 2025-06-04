@@ -48,7 +48,7 @@ export function Profile() {
               <ToastMessage
                 id={id}
                 action="error"
-                title="Image muito grande!"
+                title="Imagem muito grande!"
                 description="Escolha uma de até 5MB"
                 onClose={() => toast.close(id)}
               />
