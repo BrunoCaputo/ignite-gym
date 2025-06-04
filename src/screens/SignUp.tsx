@@ -11,7 +11,6 @@ import {
   VStack,
 } from '@gluestack-ui/themed'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { HttpFetch } from '@http/fetch'
 import { useNavigation } from '@react-navigation/native'
 import { Controller, useForm } from 'react-hook-form'
 import { KeyboardAvoidingView, Platform } from 'react-native'
@@ -48,11 +47,8 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      await HttpFetch.post<Omit<FormDataProps, 'password_confirm'>>('/users', {
-        name,
-        email,
-        password,
-      })
+      // TODO
+      console.log({ name, email, password })
     } catch (error) {
       console.error('Error during sign up:', error)
     }
