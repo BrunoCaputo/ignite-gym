@@ -2,18 +2,21 @@ import BackgroundImg from '@assets/background.png'
 import Logo from '@assets/logo.svg'
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
+import { ToastMessage } from '@components/ToastMessage'
 import {
   Center,
   Heading,
   Image,
   ScrollView,
   Text,
+  useToast,
   VStack,
 } from '@gluestack-ui/themed'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from '@hooks/useAuth'
 import { useNavigation } from '@react-navigation/native'
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes'
+import { AppError } from '@utils/AppError'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
@@ -26,7 +29,7 @@ type FormDataProps = yup.InferType<typeof signInSchema>
 
 export function SignIn() {
   const { signIn } = useAuth()
-
+  const toast = useToast()
   const navigation = useNavigation<AuthNavigatorRoutesProps>()
 
   const {
@@ -42,7 +45,27 @@ export function SignIn() {
   }
 
   async function handleSignIn({ email, password }: FormDataProps) {
-    await signIn(email, password)
+    try {
+      await signIn(email, password)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível entrar. Tente novamente mais tarde.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            action="error"
+            title={title}
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+    }
   }
 
   return (
