@@ -11,6 +11,7 @@ import {
   VStack,
 } from '@gluestack-ui/themed'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useAuth } from '@hooks/useAuth'
 import { useNavigation } from '@react-navigation/native'
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes'
 import { Controller, useForm } from 'react-hook-form'
@@ -24,6 +25,8 @@ const signInSchema = yup.object({
 type FormDataProps = yup.InferType<typeof signInSchema>
 
 export function SignIn() {
+  const { signIn } = useAuth()
+
   const navigation = useNavigation<AuthNavigatorRoutesProps>()
 
   const {
@@ -38,8 +41,8 @@ export function SignIn() {
     navigation.navigate('signUp')
   }
 
-  function handleSignIn({ email, password }: FormDataProps) {
-    console.log(email, password)
+  async function handleSignIn({ email, password }: FormDataProps) {
+    await signIn(email, password)
   }
 
   return (
