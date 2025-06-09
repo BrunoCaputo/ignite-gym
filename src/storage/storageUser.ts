@@ -15,4 +15,8 @@ async function getStorageUser() {
   return user
 }
 
-export { saveStorageUser, getStorageUser }
+async function removeStorageUser() {
+  await AsyncStorage.removeItem(USER_STORAGE)
+}
+
+export { saveStorageUser, getStorageUser, removeStorageUser }

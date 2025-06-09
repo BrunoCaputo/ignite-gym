@@ -1,6 +1,10 @@
 import { UserDTO } from '@dtos/UserDTO'
 import { api } from '@services/api'
-import { getStorageUser, saveStorageUser } from '@storage/storageUser'
+import {
+  getStorageUser,
+  removeStorageUser,
+  saveStorageUser,
+} from '@storage/storageUser'
 import { createContext, PropsWithChildren, useEffect, useState } from 'react'
 
 export interface AuthContextDataProps {
@@ -35,9 +39,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }
 
-  function signOut() {
-    setUser({} as UserDTO)
-    saveStorageUser({} as UserDTO)
+  async function signOut() {
+    try {
+      setIsLoadingUserStorageData(true)
+      setUser({} as UserDTO)
+      await removeStorageUser()
+    } catch (error) {
+      console.error(error)
+      throw error
+    } finally {
+      setIsLoadingUserStorageData(false)
+    }
   }
 
   async function loadUserData() {
