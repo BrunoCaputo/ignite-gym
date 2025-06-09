@@ -18,7 +18,7 @@ export function Home() {
   const [groups] = useState<string[]>(['Costas', 'Bíceps', 'Tríceps', 'Ombro'])
   const [groupSelected, setGroupSelected] = useState<string>('Costas')
 
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   const navigation = useNavigation<AppNavigatorRoutesProps>()
 
   function handleOpenExerciseDetails(params: AppRoutes['exercise']) {
@@ -27,7 +27,7 @@ export function Home() {
 
   return (
     <VStack flex={1}>
-      <HomeHeader onSignOut={signOut} />
+      <HomeHeader onSignOut={signOut} user={user} />
 
       <FlatList
         data={groups}

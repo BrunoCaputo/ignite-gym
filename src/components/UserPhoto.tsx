@@ -1,9 +1,9 @@
 import { Image } from '@gluestack-ui/themed'
 import { ComponentProps } from 'react'
 
-type Props = ComponentProps<typeof Image>
+type UserPhotoProps = ComponentProps<typeof Image>
 
-export function UserPhoto({ ...props }: Props) {
+export function UserPhoto({ ...props }: UserPhotoProps) {
   return (
     <Image
       rounded="$full"
