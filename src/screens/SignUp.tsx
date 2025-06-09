@@ -13,9 +13,11 @@ import {
   VStack,
 } from '@gluestack-ui/themed'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useAuth } from '@hooks/useAuth'
 import { useNavigation } from '@react-navigation/native'
 import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import * as yup from 'yup'
@@ -36,6 +38,8 @@ const signUpSchema = yup.object({
 type FormDataProps = yup.InferType<typeof signUpSchema>
 
 export function SignUp() {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const {
     control,
     handleSubmit,
@@ -45,6 +49,7 @@ export function SignUp() {
   })
   const navigation = useNavigation()
   const toast = useToast()
+  const { signIn } = useAuth()
 
   function handleLogin() {
     navigation.goBack()
@@ -52,14 +57,18 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      const { data } = await api.post('/users', { name, email, password })
-      console.log(data)
+      setIsLoading(true)
+
+      await api.post('/users', { name, email, password })
+      await signIn(email, password)
     } catch (error) {
       const isAppError = error instanceof AppError
 
       const title = isAppError
         ? error.message
         : 'Não foi possível criar a conta. Tente novamente mais tarde'
+
+      setIsLoading(false)
 
       toast.show({
         placement: 'top',
@@ -167,6 +176,7 @@ export function SignUp() {
               <Button
                 title="Criar e acessar"
                 onPress={handleSubmit(handleSignUp)}
+                isLoading={isLoading}
               />
             </Center>
 
