@@ -5,6 +5,7 @@ import { createContext, PropsWithChildren, useState } from 'react'
 export interface AuthContextDataProps {
   user: UserDTO
   signIn: (email: string, password: string) => Promise<void>
+  signOut: () => void
 }
 
 export const AuthContext = createContext<AuthContextDataProps>(
@@ -29,8 +30,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }
 
+  function signOut() {
+    setUser({} as UserDTO)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, signIn }}>
+    <AuthContext.Provider value={{ user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

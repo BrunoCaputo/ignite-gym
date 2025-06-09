@@ -2,6 +2,7 @@ import { ExerciseCard } from '@components/ExerciseCard'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
+import { useAuth } from '@hooks/useAuth'
 import { useNavigation } from '@react-navigation/native'
 import { AppNavigatorRoutesProps, AppRoutes } from '@routes/app.routes'
 import { useState } from 'react'
@@ -17,6 +18,7 @@ export function Home() {
   const [groups] = useState<string[]>(['Costas', 'Bíceps', 'Tríceps', 'Ombro'])
   const [groupSelected, setGroupSelected] = useState<string>('Costas')
 
+  const { signOut } = useAuth()
   const navigation = useNavigation<AppNavigatorRoutesProps>()
 
   function handleOpenExerciseDetails(params: AppRoutes['exercise']) {
@@ -25,7 +27,7 @@ export function Home() {
 
   return (
     <VStack flex={1}>
-      <HomeHeader />
+      <HomeHeader onSignOut={signOut} />
 
       <FlatList
         data={groups}
