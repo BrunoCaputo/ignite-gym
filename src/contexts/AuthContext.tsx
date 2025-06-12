@@ -1,6 +1,9 @@
 import { UserDTO } from '@dtos/UserDTO'
 import { api } from '@services/api'
-import { saveStorageAuthToken } from '@storage/storageAuthToken'
+import {
+  getStorageAuthToken,
+  saveStorageAuthToken,
+} from '@storage/storageAuthToken'
 import {
   getStorageUser,
   removeStorageUser,
@@ -12,7 +15,7 @@ export interface AuthContextDataProps {
   user: UserDTO
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => void
-  isLoadingUserStorageData: boolean
+  isLoadingStorageData: boolean
 }
 
 export const AuthContext = createContext<AuthContextDataProps>(
@@ -24,35 +27,39 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [isLoadingStorageData, setIsLoadingStorageData] =
     useState<boolean>(true)
 
+  async function updateUserAndToken(userData: UserDTO, token: string) {
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
+
+    setUser(userData)
+  }
+
   async function storeUserAndToken(userData: UserDTO, token: string) {
     try {
-      setIsLoadingStorageData(true)
-
-      api.defaults.headers.common.Authorization = `Bearer ${token}`
-
       await saveStorageUser(userData)
       await saveStorageAuthToken(token)
-      setUser(userData)
     } catch (error) {
       console.error(error)
       throw error
-    } finally {
-      setIsLoadingStorageData(false)
     }
   }
 
   async function signIn(email: string, password: string) {
     try {
+      setIsLoadingStorageData(true)
+
       const {
         data: { user: userData, token },
       } = await api.post('/sessions', { email, password })
 
       if (userData && token) {
-        storeUserAndToken(userData, token)
+        await storeUserAndToken(userData, token)
+        await updateUserAndToken(userData, token)
       }
     } catch (error) {
       console.error(error)
       throw error
+    } finally {
+      setIsLoadingStorageData(false)
     }
   }
 
@@ -71,10 +78,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   async function loadUserData() {
     try {
-      const loggedUser = await getStorageUser()
+      setIsLoadingStorageData(true)
 
-      if (loggedUser) {
-        setUser(loggedUser)
+      const loggedUser = await getStorageUser()
+      const token = await getStorageAuthToken()
+
+      if (token && loggedUser) {
+        updateUserAndToken(loggedUser, token)
       }
     } catch (error) {
       console.error(error)
@@ -94,7 +104,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         user,
         signIn,
         signOut,
-        isLoadingUserStorageData: isLoadingStorageData,
+        isLoadingStorageData,
       }}
     >
       {children}

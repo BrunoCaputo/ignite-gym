@@ -8,12 +8,12 @@ import { AppRoutes } from './app.routes'
 import { AuthRoutes } from './auth.routes'
 
 export function Routes() {
-  const { user, isLoadingUserStorageData } = useAuth()
+  const { user, isLoadingStorageData } = useAuth()
 
   const theme = DefaultTheme
   theme.colors.background = gluestackUIConfig.tokens.colors.gray700
 
-  if (isLoadingUserStorageData) {
+  if (isLoadingStorageData) {
     return <Loading />
   }
 
