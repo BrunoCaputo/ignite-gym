@@ -2,6 +2,7 @@ import { UserDTO } from '@dtos/UserDTO'
 import { api } from '@services/api'
 import {
   getStorageAuthToken,
+  removeStorageAuthToken,
   saveStorageAuthToken,
 } from '@storage/storageAuthToken'
 import {
@@ -68,6 +69,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoadingStorageData(true)
       setUser({} as UserDTO)
       await removeStorageUser()
+      await removeStorageAuthToken()
     } catch (error) {
       console.error(error)
       throw error
