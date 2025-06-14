@@ -1,3 +1,4 @@
+import { ExerciseDTO } from '@dtos/ExerciseDTO'
 import {
   Heading,
   HStack,
@@ -10,15 +11,11 @@ import { ChevronRight } from 'lucide-react-native'
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
 
 interface ExerciseCardProps extends TouchableOpacityProps {
-  title: string
-  legend: string
-  imageUri: string
+  exercise: ExerciseDTO
 }
 
 export function ExerciseCard({
-  title,
-  legend,
-  imageUri,
+  exercise: { name, series, repetitions },
   ...props
 }: ExerciseCardProps) {
   return (
@@ -33,7 +30,7 @@ export function ExerciseCard({
       >
         <Image
           source={{
-            uri: imageUri,
+            uri: 'https://static.wixstatic.com/media/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp/v1/fill/w_350,h_375,al_c/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp',
           }}
           alt="Imagem do exercício"
           w="$16"
@@ -45,10 +42,10 @@ export function ExerciseCard({
 
         <VStack flex={1}>
           <Heading fontSize="$lg" color="$white" fontFamily="$heading">
-            {title}
+            {name}
           </Heading>
           <Text fontSize="$sm" color="$gray200" mt="$1" numberOfLines={2}>
-            {legend}
+            {series} séries x {repetitions} repetições
           </Text>
         </VStack>
 
