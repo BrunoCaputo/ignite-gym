@@ -8,10 +8,9 @@ import { ExerciseDTO } from '@dtos/ExerciseDTO'
 import { Heading, HStack, Text, useToast, VStack } from '@gluestack-ui/themed'
 import { useAuth } from '@hooks/useAuth'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
-import { AppNavigatorRoutesProps, AppRoutes } from '@routes/app.routes'
+import { AppNavigatorRoutesProps } from '@routes/app.routes'
 import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
-import { getExerciseDemo } from '@utils/getExerciseImages'
 import { useCallback, useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
 
@@ -25,17 +24,8 @@ export function Home() {
   const toast = useToast()
   const navigation = useNavigation<AppNavigatorRoutesProps>()
 
-  function handleOpenExerciseDetails(exercise: ExerciseDTO) {
-    const imageUri = getExerciseDemo(exercise.demo)
-
-    const params: AppRoutes['exercise'] = {
-      title: exercise.name,
-      group: exercise.group.toLowerCase(),
-      imageUri,
-      series: exercise.series.toString(),
-      reps: exercise.repetitions,
-    }
-    navigation.navigate('exercise', params)
+  function handleOpenExerciseDetails(exerciseId: string) {
+    navigation.navigate('exercise', { exerciseId })
   }
 
   async function fetchGroups() {
@@ -140,7 +130,7 @@ export function Home() {
               <ExerciseCard
                 exercise={item}
                 onPress={() => {
-                  handleOpenExerciseDetails(item)
+                  handleOpenExerciseDetails(item.id)
                 }}
               />
             )}
