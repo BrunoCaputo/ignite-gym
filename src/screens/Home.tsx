@@ -10,6 +10,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { AppNavigatorRoutesProps, AppRoutes } from '@routes/app.routes'
 import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
+import { getExerciseDemo } from '@utils/getExerciseImages'
 import { useCallback, useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
 
@@ -23,11 +24,12 @@ export function Home() {
   const navigation = useNavigation<AppNavigatorRoutesProps>()
 
   function handleOpenExerciseDetails(exercise: ExerciseDTO) {
+    const imageUri = getExerciseDemo(exercise.demo)
+
     const params: AppRoutes['exercise'] = {
       title: exercise.name,
       group: exercise.group.toLowerCase(),
-      imageUri:
-        'https://static.wixstatic.com/media/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp/v1/fill/w_350,h_375,al_c/2edbed_60c206e178ad4eb3801f4f47fc6523df~mv2.webp',
+      imageUri,
       series: exercise.series.toString(),
       reps: exercise.repetitions,
     }
