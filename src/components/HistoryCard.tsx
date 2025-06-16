@@ -2,11 +2,11 @@ import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
 
 interface HistoryCardProps {
   group: string
-  exercise: string
-  time: string
+  name: string
+  hour: string
 }
 
-export function HistoryCard({ group, exercise, time }: HistoryCardProps) {
+export function HistoryCard({ group, name, hour }: HistoryCardProps) {
   return (
     <HStack
       w="$full"
@@ -30,12 +30,12 @@ export function HistoryCard({ group, exercise, time }: HistoryCardProps) {
         </Heading>
 
         <Text color="$gray100" fontSize="$lg" numberOfLines={1}>
-          {exercise}
+          {name}
         </Text>
       </VStack>
 
       <Text color="$gray300" fontSize="$md">
-        {time}
+        {hour}
       </Text>
     </HStack>
   )
