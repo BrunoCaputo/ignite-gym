@@ -10,7 +10,6 @@ import {
   Heading,
   HStack,
   Icon,
-  Image,
   Text,
   useToast,
   VStack,
@@ -23,6 +22,7 @@ import { getExerciseDemo } from '@utils/getExerciseImages'
 import { ArrowLeft } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native'
+import WebView from 'react-native-webview'
 
 export function Exercise() {
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO)
@@ -110,15 +110,23 @@ export function Exercise() {
         ) : (
           <VStack p="$8">
             <Box mb="$3" overflow="hidden" rounded="$lg">
-              <Image
+              <WebView
                 source={{
-                  uri: getExerciseDemo(exercise.demo),
+                  html: `
+                    <html>
+                      <body style="margin:0;padding:0;">
+                        <img src="${getExerciseDemo(exercise.demo)}" style="width:100%;height:100%;object-fit:cover;" />
+                      </body>
+                    </html>
+                  `,
                 }}
-                alt="Exercício"
-                resizeMode="cover"
-                rounded="$lg"
-                w="$full"
-                h="$80"
+                style={{
+                  width: '100%',
+                  height: 320,
+                  backgroundColor: 'transparent',
+                }}
+                scrollEnabled={false}
+                originWhitelist={['*']}
               />
             </Box>
 
