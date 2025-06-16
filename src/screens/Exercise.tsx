@@ -27,6 +27,7 @@ import WebView from 'react-native-webview'
 export function Exercise() {
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [sendingRegister, setSendingRegister] = useState<boolean>(false)
 
   const navigation = useNavigation<AppNavigatorRoutesProps>()
   const route = useRoute<ExerciseRouteProp>()
@@ -58,6 +59,47 @@ export function Exercise() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function handleExerciseHistoryRegister() {
+    try {
+      setSendingRegister(true)
+
+      await api.post('/history', { exercise_id: exerciseId })
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            title="Parabéns!"
+            description="Exercício registrado no seu histórico."
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+
+      navigation.navigate('history')
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível registrar exercício.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            action="error"
+            title={title}
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+    } finally {
+      setSendingRegister(false)
     }
   }
 
@@ -152,7 +194,11 @@ export function Exercise() {
                 </HStack>
               </HStack>
 
-              <Button title="Marcar como realizado" />
+              <Button
+                title="Marcar como realizado"
+                isLoading={sendingRegister}
+                onPress={handleExerciseHistoryRegister}
+              />
             </Box>
           </VStack>
         )}
