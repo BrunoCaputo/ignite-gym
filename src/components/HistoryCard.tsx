@@ -1,12 +1,11 @@
+import { HistoryDTO } from '@dtos/HistoryDTO'
 import { Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
 
 interface HistoryCardProps {
-  group: string
-  name: string
-  hour: string
+  data: HistoryDTO
 }
 
-export function HistoryCard({ group, name, hour }: HistoryCardProps) {
+export function HistoryCard({ data: { group, name, hour } }: HistoryCardProps) {
   return (
     <HStack
       w="$full"
