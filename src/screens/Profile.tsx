@@ -1,28 +1,60 @@
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { ScreenHeader } from '@components/ScreenHeader'
+import { Skeleton } from '@components/Skeleton'
 import { ToastMessage } from '@components/ToastMessage'
 import { UserPhoto } from '@components/UserPhoto'
 import { Center, Heading, Text, useToast, VStack } from '@gluestack-ui/themed'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useAuth } from '@hooks/useAuth'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   TouchableOpacity,
 } from 'react-native'
+import * as yup from 'yup'
+
+const profileSchema = yup.object({
+  name: yup.string().required('Informe o nome'),
+  email: yup.string().required('Informe o e-mail').email('E-mail inválido'),
+  old_password: yup.string().required('Informa a senha antiga'),
+  password: yup
+    .string()
+    .required('Informe a nova senha')
+    .min(6, 'A senha deve ter pelo menos 6 dígitos'),
+  password_confirm: yup
+    .string()
+    .required('Confirme a nova senha')
+    .oneOf([yup.ref('password'), ''], 'As senhas devem ser iguais'),
+})
+
+type FormDataProps = yup.InferType<typeof profileSchema>
 
 export function Profile() {
-  const [userPhoto, setUserPhoto] = useState(
+  const [photoIsLoading, setPhotoIsLoading] = useState<boolean>(false)
+  const [userPhoto, setUserPhoto] = useState<string>(
     'https://github.com/BrunoCaputo.png',
   )
 
   const toast = useToast()
+  const { user } = useAuth()
+  const { control } = useForm<FormDataProps>({
+    resolver: yupResolver(profileSchema),
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  })
 
   async function handleUserPhotoSelect() {
     try {
+      setPhotoIsLoading(true)
+
       const selectedImage = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: 'images',
         quality: 1,
@@ -60,6 +92,8 @@ export function Profile() {
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      setPhotoIsLoading(false)
     }
   }
 
@@ -73,11 +107,15 @@ export function Profile() {
       >
         <ScrollView contentContainerStyle={{ paddingBottom: 36 }}>
           <Center mt="$6" px="$10">
-            <UserPhoto
-              source={{ uri: userPhoto }}
-              size="xl"
-              alt="Imagem do usuário"
-            />
+            {photoIsLoading ? (
+              <Skeleton size="$33" />
+            ) : (
+              <UserPhoto
+                source={{ uri: userPhoto }}
+                size="xl"
+                alt="Imagem do usuário"
+              />
+            )}
 
             <TouchableOpacity onPress={handleUserPhotoSelect}>
               <Text
@@ -92,8 +130,31 @@ export function Profile() {
             </TouchableOpacity>
 
             <Center w="$full" gap="$4">
-              <Input placeholder="Nome" bg="$gray600" />
-              <Input value="bruno@email.com" bg="$gray600" isReadOnly />
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    placeholder="Nome"
+                    bg="$gray600"
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    placeholder="E-mail"
+                    bg="$gray600"
+                    isReadOnly
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                )}
+              />
             </Center>
 
             <Heading
