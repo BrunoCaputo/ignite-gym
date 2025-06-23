@@ -55,9 +55,7 @@ type FormDataProps = yup.InferType<typeof profileSchema>
 export function Profile() {
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const [photoIsLoading, setPhotoIsLoading] = useState<boolean>(false)
-  const [userPhoto, setUserPhoto] = useState<string>(
-    'https://github.com/BrunoCaputo.png',
-  )
+  const [userPhoto] = useState<string>('https://github.com/BrunoCaputo.png')
 
   const toast = useToast()
   const { user, updateUserProfile } = useAuth()
@@ -89,7 +87,9 @@ export function Profile() {
         return
       }
 
-      const imageUri = selectedImage.assets[0].uri
+      const image = selectedImage.assets[0]
+
+      const imageUri = image.uri
 
       if (imageUri) {
         const imageInfo = (await FileSystem.getInfoAsync(imageUri)) as {
@@ -111,7 +111,15 @@ export function Profile() {
           })
         }
 
-        setUserPhoto(selectedImage.assets[0].uri)
+        const fileExtension = imageUri.split('.').pop()
+
+        const imageFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: imageUri,
+          type: `${image.type}/${fileExtension}`,
+        }
+
+        console.log(imageFile)
       }
     } catch (error) {
       console.error(error)
