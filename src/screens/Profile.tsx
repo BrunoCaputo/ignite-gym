@@ -23,15 +23,28 @@ const profileSchema = yup
   .object({
     name: yup.string().required('Informe o nome'),
     email: yup.string().required('Informe o e-mail').email('E-mail inválido'),
-    old_password: yup.string().optional(),
+    old_password: yup
+      .string()
+      .nullable()
+      .transform((value) => value ?? null),
     password: yup
       .string()
       .min(6, 'A senha deve ter pelo menos 6 dígitos')
-      .optional(),
+      .nullable()
+      .transform((value) => value ?? null),
     password_confirm: yup
       .string()
-      .oneOf([yup.ref('password'), undefined], 'As senhas devem ser iguais')
-      .optional(),
+      .nullable()
+      .transform((value) => value ?? null)
+      .oneOf([yup.ref('password'), null], 'As senhas devem ser iguais')
+      .when('password', {
+        is: (Field: unknown) => Field,
+        then: (schema) =>
+          schema
+            .nullable()
+            .required('Informe a confirmação da senha.')
+            .transform((value) => value ?? null),
+      }),
   })
   .strict(true)
 
