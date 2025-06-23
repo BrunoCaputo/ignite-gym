@@ -19,19 +19,21 @@ import {
 } from 'react-native'
 import * as yup from 'yup'
 
-const profileSchema = yup.object({
-  name: yup.string().required('Informe o nome'),
-  email: yup.string().required('Informe o e-mail').email('E-mail inválido'),
-  old_password: yup.string().required('Informa a senha antiga'),
-  password: yup
-    .string()
-    .required('Informe a nova senha')
-    .min(6, 'A senha deve ter pelo menos 6 dígitos'),
-  password_confirm: yup
-    .string()
-    .required('Confirme a nova senha')
-    .oneOf([yup.ref('password'), ''], 'As senhas devem ser iguais'),
-})
+const profileSchema = yup
+  .object({
+    name: yup.string().required('Informe o nome'),
+    email: yup.string().required('Informe o e-mail').email('E-mail inválido'),
+    old_password: yup.string().optional(),
+    password: yup
+      .string()
+      .min(6, 'A senha deve ter pelo menos 6 dígitos')
+      .optional(),
+    password_confirm: yup
+      .string()
+      .oneOf([yup.ref('password'), undefined], 'As senhas devem ser iguais')
+      .optional(),
+  })
+  .strict(true)
 
 type FormDataProps = yup.InferType<typeof profileSchema>
 
@@ -43,12 +45,17 @@ export function Profile() {
 
   const toast = useToast()
   const { user } = useAuth()
-  const { control } = useForm<FormDataProps>({
-    resolver: yupResolver(profileSchema),
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
     defaultValues: {
       name: user.name,
       email: user.email,
     },
+    // @ts-expect-error Type error
+    resolver: yupResolver(profileSchema),
   })
 
   async function handleUserPhotoSelect() {
@@ -97,6 +104,10 @@ export function Profile() {
     }
   }
 
+  async function handleProfileUpdate(data: FormDataProps) {
+    console.log(data)
+  }
+
   return (
     <VStack flex={1}>
       <ScreenHeader title="Perfil" />
@@ -139,6 +150,7 @@ export function Profile() {
                     bg="$gray600"
                     onChangeText={onChange}
                     value={value}
+                    errorMessage={errors.name?.message}
                   />
                 )}
               />
@@ -152,6 +164,7 @@ export function Profile() {
                     isReadOnly
                     onChangeText={onChange}
                     value={value}
+                    errorMessage={errors.email?.message}
                   />
                 )}
               />
@@ -169,15 +182,53 @@ export function Profile() {
             </Heading>
 
             <Center w="$full" gap="$4">
-              <Input placeholder="Senha antiga" bg="$gray600" secureTextEntry />
-              <Input placeholder="Nova senha" bg="$gray600" secureTextEntry />
-              <Input
-                placeholder="Confirme a nova senha"
-                bg="$gray600"
-                secureTextEntry
+              <Controller
+                control={control}
+                name="old_password"
+                render={({ field: { onChange } }) => (
+                  <Input
+                    placeholder="Senha antiga"
+                    bg="$gray600"
+                    secureTextEntry
+                    onChangeText={onChange}
+                    errorMessage={errors.old_password?.message}
+                  />
+                )}
               />
 
-              <Button title="Atualizar" />
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange } }) => (
+                  <Input
+                    placeholder="Nova senha"
+                    bg="$gray600"
+                    secureTextEntry
+                    onChangeText={onChange}
+                    errorMessage={errors.password?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="password_confirm"
+                render={({ field: { onChange } }) => (
+                  <Input
+                    placeholder="Confirme a nova senha"
+                    bg="$gray600"
+                    secureTextEntry
+                    onChangeText={onChange}
+                    errorMessage={errors.password_confirm?.message}
+                  />
+                )}
+              />
+
+              <Button
+                title="Atualizar"
+                // @ts-expect-error Type error
+                onPress={handleSubmit(handleProfileUpdate)}
+              />
             </Center>
           </Center>
         </ScrollView>
