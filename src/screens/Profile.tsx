@@ -117,9 +117,29 @@ export function Profile() {
           name: `${user.name}.${fileExtension}`.toLowerCase(),
           uri: imageUri,
           type: `${image.type}/${fileExtension}`,
-        }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any
 
-        console.log(imageFile)
+        const userImageUploadForm = new FormData()
+
+        userImageUploadForm.append('avatar', imageFile)
+
+        await api.patch('/users/avatar', userImageUploadForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+
+        toast.show({
+          placement: 'top',
+          render: ({ id }) => (
+            <ToastMessage
+              id={id}
+              title="Foto atualizada!"
+              onClose={() => toast.close(id)}
+            />
+          ),
+        })
       }
     } catch (error) {
       console.error(error)
