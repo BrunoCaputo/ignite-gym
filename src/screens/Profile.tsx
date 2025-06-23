@@ -7,6 +7,8 @@ import { UserPhoto } from '@components/UserPhoto'
 import { Center, Heading, Text, useToast, VStack } from '@gluestack-ui/themed'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from '@hooks/useAuth'
+import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
@@ -51,13 +53,14 @@ const profileSchema = yup
 type FormDataProps = yup.InferType<typeof profileSchema>
 
 export function Profile() {
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const [photoIsLoading, setPhotoIsLoading] = useState<boolean>(false)
   const [userPhoto, setUserPhoto] = useState<string>(
     'https://github.com/BrunoCaputo.png',
   )
 
   const toast = useToast()
-  const { user } = useAuth()
+  const { user, updateUserProfile } = useAuth()
   const {
     control,
     handleSubmit,
@@ -118,7 +121,46 @@ export function Profile() {
   }
 
   async function handleProfileUpdate(data: FormDataProps) {
-    console.log(data)
+    try {
+      setIsUpdating(true)
+
+      const userUpdated = user
+      userUpdated.name = data.name
+
+      await api.put('/users', data)
+
+      await updateUserProfile(userUpdated)
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            title="Perfil atualizado com sucesso!"
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível atualizar os dados. Tente novamente mais tarde.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            action="error"
+            title={title}
+            onClose={() => toast.close(id)}
+          />
+        ),
+      })
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   return (
@@ -239,6 +281,7 @@ export function Profile() {
 
               <Button
                 title="Atualizar"
+                isLoading={isUpdating}
                 // @ts-expect-error Type error
                 onPress={handleSubmit(handleProfileUpdate)}
               />
