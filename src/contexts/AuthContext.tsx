@@ -109,6 +109,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     loadUserData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const subscribe = api.registerInterceptTokenManager(signOut)
+
+    return () => {
+      subscribe()
+    }
   }, [])
 
   return (
