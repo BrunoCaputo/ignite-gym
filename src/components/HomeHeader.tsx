@@ -1,6 +1,7 @@
 import DefaultUserPhoto from '@assets/userPhotoDefault.png'
 import { UserDTO } from '@dtos/UserDTO'
 import { Heading, HStack, Icon, Text, VStack } from '@gluestack-ui/themed'
+import { getUserImage } from '@utils/getUserImage'
 import { LogOut } from 'lucide-react-native'
 import { TouchableOpacity } from 'react-native'
 
@@ -15,7 +16,9 @@ export function HomeHeader({ onSignOut, user }: HomeHeaderProps) {
   return (
     <HStack bg="$gray600" pt="$16" pb="$5" px="$8" alignItems="center" gap="$4">
       <UserPhoto
-        source={user.avatar ? { uri: user.avatar } : DefaultUserPhoto}
+        source={
+          user.avatar ? { uri: getUserImage(user.avatar) } : DefaultUserPhoto
+        }
         w="$16"
         h="$16"
         alt="Imagem do usuário"

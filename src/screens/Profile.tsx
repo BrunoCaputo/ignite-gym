@@ -1,3 +1,4 @@
+import DefaultUserPhoto from '@assets/userPhotoDefault.png'
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { ScreenHeader } from '@components/ScreenHeader'
@@ -9,6 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from '@hooks/useAuth'
 import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
+import { getUserImage } from '@utils/getUserImage'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
@@ -55,7 +57,6 @@ type FormDataProps = yup.InferType<typeof profileSchema>
 export function Profile() {
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const [photoIsLoading, setPhotoIsLoading] = useState<boolean>(false)
-  const [userPhoto] = useState<string>('https://github.com/BrunoCaputo.png')
 
   const toast = useToast()
   const { user, updateUserProfile } = useAuth()
@@ -124,11 +125,20 @@ export function Profile() {
 
         userImageUploadForm.append('avatar', imageFile)
 
-        await api.patch('/users/avatar', userImageUploadForm, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const updatedAvatarResponse = await api.patch(
+          '/users/avatar',
+          userImageUploadForm,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        })
+        )
+
+        const userUpdated = user
+        userUpdated.avatar = updatedAvatarResponse.data.avatar
+
+        await updateUserProfile(userUpdated)
 
         toast.show({
           placement: 'top',
@@ -205,7 +215,11 @@ export function Profile() {
               <Skeleton size="$33" />
             ) : (
               <UserPhoto
-                source={{ uri: userPhoto }}
+                source={
+                  user.avatar
+                    ? { uri: getUserImage(user.avatar) }
+                    : DefaultUserPhoto
+                }
                 size="xl"
                 alt="Imagem do usuário"
               />
