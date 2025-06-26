@@ -72,6 +72,23 @@ api.registerInterceptTokenManager = (signOut) => {
                 token,
                 refreshToken: refresh_token,
               })
+
+              if (originalRequestConfig.data) {
+                originalRequestConfig.data = JSON.parse(
+                  originalRequestConfig.data,
+                )
+              }
+
+              originalRequestConfig.headers = {
+                Authorization: `Bearer ${token}`,
+              }
+              api.defaults.headers.common.Authorization = `Bearer ${token}`
+
+              failedQueued.forEach((request) => {
+                request.onSuccess(token)
+              })
+
+              resolve(api(originalRequestConfig))
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
               failedQueued.forEach((request) => {
