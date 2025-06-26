@@ -35,10 +35,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setUser(userData)
   }
 
-  async function storeUserAndToken(userData: UserDTO, token: string) {
+  async function storeUserAndToken(
+    userData: UserDTO,
+    token: string,
+    refreshToken: string,
+  ) {
     try {
       await saveStorageUser(userData)
-      await saveStorageAuthToken(token)
+      await saveStorageAuthToken({ token, refreshToken })
     } catch (error) {
       console.error(error)
       throw error
@@ -50,11 +54,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoadingStorageData(true)
 
       const {
-        data: { user: userData, token },
+        data: { user: userData, token, refresh_token: refreshToken },
       } = await api.post('/sessions', { email, password })
 
-      if (userData && token) {
-        await storeUserAndToken(userData, token)
+      if (userData && token && refreshToken) {
+        await storeUserAndToken(userData, token, refreshToken)
         await updateUserAndToken(userData, token)
       }
     } catch (error) {
@@ -94,7 +98,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoadingStorageData(true)
 
       const loggedUser = await getStorageUser()
-      const token = await getStorageAuthToken()
+      const { token } = await getStorageAuthToken()
 
       if (token && loggedUser) {
         updateUserAndToken(loggedUser, token)
