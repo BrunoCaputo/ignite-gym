@@ -1,4 +1,7 @@
-import { getStorageAuthToken } from '@storage/storageAuthToken'
+import {
+  getStorageAuthToken,
+  saveStorageAuthToken,
+} from '@storage/storageAuthToken'
 import { AppError } from '@utils/AppError'
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
@@ -17,7 +20,7 @@ const api = axios.create({
   baseURL: 'http://192.168.18.47:3333',
 }) as APIInstanceProps
 
-const failedQueued: Array<PromiseType> = []
+let failedQueued: Array<PromiseType> = []
 let isRefreshing = false
 
 api.registerInterceptTokenManager = (signOut) => {
@@ -55,6 +58,33 @@ api.registerInterceptTokenManager = (signOut) => {
           }
 
           isRefreshing = true
+
+          // eslint-disable-next-line no-async-promise-executor
+          return new Promise(async (resolve, reject) => {
+            try {
+              const {
+                data: { token, refresh_token },
+              } = await api.post('/sessions/refresh-token', {
+                refreshToken,
+              })
+
+              await saveStorageAuthToken({
+                token,
+                refreshToken: refresh_token,
+              })
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (error: any) {
+              failedQueued.forEach((request) => {
+                request.onFailure(error)
+              })
+
+              signOut()
+              reject(error)
+            } finally {
+              isRefreshing = false
+              failedQueued = []
+            }
+          })
         }
 
         signOut()
